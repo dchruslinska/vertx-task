@@ -25,9 +25,9 @@ public class UserService {
     JsonObject match = new JsonObject();
     match.put("login", login);
 
-    mongoClient.findOne("user", match, null, res -> {
-      if (res.succeeded()) {
-        if (res.result() != null) {
+    mongoClient.findOne("user", match, null, jsonObjectAsyncResult ->  {
+      if (jsonObjectAsyncResult.succeeded()) {
+        if (jsonObjectAsyncResult.result() != null) {
           response(routingContext, 400);
           //found user with this login
         } else {
@@ -40,16 +40,17 @@ public class UserService {
   public static void loginAndPasswordCheck(RoutingContext routingContext) {
     String login = routingContext.getBodyAsJson().getString("login");
     String password = routingContext.getBodyAsJson().getString("password");
-    JsonObject match = new JsonObject().put("login", login);
+    JsonObject loginMatch = new JsonObject().put("login", login);
 
-    mongoClient.findOne("user", match, null, res -> {
-      if (res.succeeded()) {
-        if (res.result() == null) { //login not found
+    mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
+      if (jsonObjectAsyncResult.succeeded()) {
+        if (jsonObjectAsyncResult.result() == null) { //login not found
           response(routingContext, 400);
         } else { //found login -> check password
-          String db_password = res.result().getString("password");
-            if (BCrypt.checkpw(password, db_password)) { //password correct
+          String dbPassword = jsonObjectAsyncResult.result().getString("password");
+            if (BCrypt.checkpw(password, dbPassword)) { //password correct
               routingContext.next();
+              response(routingContext, 200);
             } else { //password incorrect
               response(routingContext, 400);
               }
