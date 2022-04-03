@@ -60,7 +60,7 @@ public class UserService {
     });
   }
 
-  public static void save(RoutingContext routingContext) {
+  public static void add(RoutingContext routingContext) {
     String login = routingContext.getBodyAsJson().getString("login");
     String password = routingContext.getBodyAsJson().getString("password");
     User user = new User();

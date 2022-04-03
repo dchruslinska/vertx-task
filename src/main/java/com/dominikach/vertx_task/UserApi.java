@@ -6,7 +6,7 @@ import io.vertx.ext.web.RoutingContext;
 public class UserApi {
 
   public static void register(RoutingContext routingContext) {
-    UserService.save(routingContext);
+    UserService.add(routingContext);
   }
 
   public static void isLoginAvailable(RoutingContext routingContext) {
