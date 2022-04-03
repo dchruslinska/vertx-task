@@ -2,7 +2,7 @@ package com.dominikach.vertx_task.Verticle;
 
 import com.dominikach.vertx_task.Configuration.JwtAuthConfig;
 import com.dominikach.vertx_task.Configuration.MongoConfig;
-import com.dominikach.vertx_task.Service.ItemService;
+import com.dominikach.vertx_task.ItemApi;
 import com.dominikach.vertx_task.Service.JwtAuthService;
 import com.dominikach.vertx_task.UserApi;
 import io.vertx.core.AbstractVerticle;
@@ -30,7 +30,7 @@ public class MainVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) {
     JsonObject db_config = MongoConfig.getDbConfig();
-    mongoClient = MongoClient.create(vertx, db_config); //db
+    mongoClient = MongoClient.create(vertx, db_config);
     jwtAuthProvider = JWTAuth.create(vertx, JwtAuthConfig.getJwtOpt());
 
     startServerandRouter(startPromise);
@@ -38,21 +38,22 @@ public class MainVerticle extends AbstractVerticle {
 
   private Router getRouter() {
     Router router = Router.router(vertx);
+
     router
       .route()
       .handler(BodyHandler.create());
-    router.get("/test").handler(ctx -> ctx.request().response().end("endpointeeee"));
     router.post("/register")
       .handler(UserApi::isLoginAvailable)
       .handler(UserApi::register);
     router.post("/login")
-      .handler(UserApi::loginAndPasswordCheck)
-      .handler(JwtAuthService::getToken);
+      .handler(UserApi::verifyUser)
+      .handler(JwtAuthService::createAuthToken);
     router.post("/items")
-      .handler(JwtAuthService::jwtAuthentication)
-      .handler(ItemService::add);
-
-
+      .handler(JwtAuthService::authenticateUser)
+      .handler(ItemApi::addItem);
+    router.get("/items")
+      .handler(JwtAuthService::authenticateUser)
+      .handler(ItemApi::showItems);
 
     return router;
   }
