@@ -50,7 +50,6 @@ public class UserService {
           String dbPassword = jsonObjectAsyncResult.result().getString("password");
             if (BCrypt.checkpw(password, dbPassword)) { //password correct
               routingContext.next();
-              response(routingContext, 200);
             } else { //password incorrect
               response(routingContext, 400);
               }
