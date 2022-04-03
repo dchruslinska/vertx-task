@@ -36,4 +36,15 @@ public class JwtAuthService {
       }
     });
   }
+  public static void jwtAuthentication(RoutingContext routingContext){
+    if(routingContext.request().headers().get("Authorization") == null) {
+      response(routingContext, 401);
+    } else {
+      String token = routingContext.request().headers().get("Authorization").substring(("Bearer ").length());
+      JsonObject tokenJson = new JsonObject().put("token", token);
+      jwtAuthProvider.authenticate(tokenJson)
+        .onSuccess( success -> routingContext.next())
+        .onFailure( fail -> response(routingContext, 401));
+    }
+  }
 }

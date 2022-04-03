@@ -27,7 +27,7 @@ public class MainVerticle extends AbstractVerticle {
   public static JWTAuth jwtAuthProvider;
 
   @Override
-  public void start(Promise<Void> startPromise) throws Exception {
+  public void start(Promise<Void> startPromise) {
     JsonObject db_config = MongoConfig.getDbConfig();
     mongoClient = MongoClient.create(vertx, db_config); //db
     jwtAuthProvider = JWTAuth.create(vertx, JwtAuthConfig.getJwtOpt());
@@ -40,15 +40,15 @@ public class MainVerticle extends AbstractVerticle {
     router
       .route()
       .handler(BodyHandler.create());
-    router.get("/test").handler(ctx -> {
-      ctx.request().response().end("endpointeeee");
-    });
+    router.get("/test").handler(ctx -> ctx.request().response().end("endpointeeee"));
     router.post("/register")
       .handler(UserApi::isLoginAvailable)
       .handler(UserApi::register);
     router.post("/login")
       .handler(UserApi::loginAndPasswordCheck)
       .handler(JwtAuthService::getToken);
+    router.post("/item")
+      .handler(JwtAuthService::jwtAuthentication);
 
 
 
