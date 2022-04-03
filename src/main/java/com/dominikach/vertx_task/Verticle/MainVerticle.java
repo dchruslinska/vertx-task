@@ -2,6 +2,7 @@ package com.dominikach.vertx_task.Verticle;
 
 import com.dominikach.vertx_task.Configuration.JwtAuthConfig;
 import com.dominikach.vertx_task.Configuration.MongoConfig;
+import com.dominikach.vertx_task.Service.ItemService;
 import com.dominikach.vertx_task.Service.JwtAuthService;
 import com.dominikach.vertx_task.UserApi;
 import io.vertx.core.AbstractVerticle;
@@ -47,8 +48,9 @@ public class MainVerticle extends AbstractVerticle {
     router.post("/login")
       .handler(UserApi::loginAndPasswordCheck)
       .handler(JwtAuthService::getToken);
-    router.post("/item")
-      .handler(JwtAuthService::jwtAuthentication);
+    router.post("/items")
+      .handler(JwtAuthService::jwtAuthentication)
+      .handler(ItemService::add);
 
 
 

@@ -42,6 +42,7 @@ public class JwtAuthService {
     } else {
       String token = routingContext.request().headers().get("Authorization").substring(("Bearer ").length());
       JsonObject tokenJson = new JsonObject().put("token", token);
+     // log.info(String.valueOf(tokenJson));
       jwtAuthProvider.authenticate(tokenJson)
         .onSuccess( success -> routingContext.next())
         .onFailure( fail -> response(routingContext, 401));
