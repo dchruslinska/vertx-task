@@ -13,25 +13,25 @@ import static com.dominikach.vertx_task.Verticle.MainVerticle.mongoClient;
 
 public class UserService {
 
-  public static void response(RoutingContext routingContext, int httpstatus) {
+  public static void response(RoutingContext routingContext, int httpstatus, String description) {
     routingContext.response()
       .putHeader("content-type", "application/json")
       .setStatusCode(httpstatus)
-      .end();
+      .end(description);
   }
 
   public static void isLoginAvailable(RoutingContext routingContext) {
     String login = routingContext.getBodyAsJson().getString("login");
     JsonObject match = new JsonObject();
     match.put("login", login);
-
     mongoClient.findOne("user", match, null, jsonObjectAsyncResult ->  {
       if (jsonObjectAsyncResult.succeeded()) {
         if (jsonObjectAsyncResult.result() != null) {
-          response(routingContext, 400);
+          response(routingContext, 400, "");
           //found user with this login
         } else {
-          routingContext.next(); //if empty
+          routingContext.next();
+          //if body empty
         }
       }
     });
@@ -44,23 +44,28 @@ public class UserService {
 
     mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
       if (jsonObjectAsyncResult.succeeded()) {
-        if (jsonObjectAsyncResult.result() == null) { //login not found
-          response(routingContext, 400);
-        } else { //found login -> check password
+        if (jsonObjectAsyncResult.result() == null) {
+          //login not found
+          response(routingContext, 400, "");
+        } else {
+          //found login -> check password
           String dbPassword = jsonObjectAsyncResult.result().getString("password");
-            if (BCrypt.checkpw(password, dbPassword)) { //password correct
+            if (BCrypt.checkpw(password, dbPassword)) {
+              //password correct
               routingContext.next();
-            } else { //password incorrect
-              response(routingContext, 400);
+            } else {
+              //password incorrect
+              response(routingContext, 400, "");
               }
         }
-      } else { //not succeeded
-        response(routingContext, 400);
+      } else {
+        //not succeeded
+        response(routingContext, 400,"");
       }
     });
   }
 
-  public static void add(RoutingContext routingContext) {
+  public static void addUser(RoutingContext routingContext) {
     String login = routingContext.getBodyAsJson().getString("login");
     String password = routingContext.getBodyAsJson().getString("password");
     User user = new User();
@@ -72,9 +77,9 @@ public class UserService {
 
     mongoClient.save("user", document, res -> {
       if (res.succeeded()) {
-        response(routingContext, 201);
+        response(routingContext, 201, "Registering successfull.");
       } else {
-        response(routingContext, 400);
+        response(routingContext, 400, "");
       }
     });
 

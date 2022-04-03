@@ -5,15 +5,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public class UserApi {
 
-  public static void register(RoutingContext routingContext) {
-    UserService.add(routingContext);
-  }
+  public static void register(RoutingContext routingContext) { UserService.addUser(routingContext); }
+  public static void isLoginAvailable(RoutingContext routingContext) { UserService.isLoginAvailable(routingContext); }
+  public static void verifyUser(RoutingContext routingContext) { UserService.loginAndPasswordCheck(routingContext); }
 
-  public static void isLoginAvailable(RoutingContext routingContext) {
-    UserService.isLoginAvailable(routingContext);
-  }
-
-  public static void loginAndPasswordCheck(RoutingContext routingContext) {
-    UserService.loginAndPasswordCheck(routingContext);
-  }
 }

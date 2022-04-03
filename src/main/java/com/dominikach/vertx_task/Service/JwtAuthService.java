@@ -17,7 +17,7 @@ public class JwtAuthService {
       .end();
   }
 
-  public static void getToken(RoutingContext routingContext) {
+  public static void createAuthToken(RoutingContext routingContext) {
     String login = routingContext.getBodyAsJson().getString("login");
     JsonObject loginMatch = new JsonObject().put("login", login);
     mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
@@ -36,7 +36,7 @@ public class JwtAuthService {
       }
     });
   }
-  public static void jwtAuthentication(RoutingContext routingContext){
+  public static void authenticateUser(RoutingContext routingContext){
     if(routingContext.request().headers().get("Authorization") == null) {
       response(routingContext, 401);
     } else {
