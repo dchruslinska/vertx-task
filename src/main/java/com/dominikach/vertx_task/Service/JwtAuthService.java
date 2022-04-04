@@ -48,4 +48,5 @@ public class JwtAuthService {
         .onFailure( fail -> response(routingContext, 401));
     }
   }
+
 }

@@ -21,48 +21,55 @@ public class UserService {
   }
 
   public static void isLoginAvailable(RoutingContext routingContext) {
-    String login = routingContext.getBodyAsJson().getString("login");
-    JsonObject match = new JsonObject();
-    match.put("login", login);
-    mongoClient.findOne("user", match, null, jsonObjectAsyncResult ->  {
-      if (jsonObjectAsyncResult.succeeded()) {
-        if (jsonObjectAsyncResult.result() != null) {
-          response(routingContext, 400, "");
-          //found user with this login
-        } else {
-          routingContext.next();
-          //if body empty
+    if(routingContext.getBody() == null) {
+      response(routingContext, 400,"You have not provided any data.");
+    } else {
+      String login = routingContext.getBodyAsJson().getString("login");
+      JsonObject loginMatch = new JsonObject();
+      loginMatch.put("login", login);
+      mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
+        if (jsonObjectAsyncResult.succeeded()) {
+          if (jsonObjectAsyncResult.result() != null) {
+            response(routingContext, 400, "This login is already taken.");
+            //found user with this login
+          } else {
+            routingContext.next();
+            //if body empty
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   public static void loginAndPasswordCheck(RoutingContext routingContext) {
-    String login = routingContext.getBodyAsJson().getString("login");
-    String password = routingContext.getBodyAsJson().getString("password");
-    JsonObject loginMatch = new JsonObject().put("login", login);
-
-    mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
-      if (jsonObjectAsyncResult.succeeded()) {
-        if (jsonObjectAsyncResult.result() == null) {
-          //login not found
-          response(routingContext, 400, "");
-        } else {
-          //found login -> check password
-          String dbPassword = jsonObjectAsyncResult.result().getString("password");
+    if (routingContext.getBody() == null) {
+      response(routingContext, 400, "You have not provided login or password.");
+    } else {
+      String login = routingContext.getBodyAsJson().getString("login");
+      String password = routingContext.getBodyAsJson().getString("password");
+      JsonObject loginMatch = new JsonObject().put("login", login);
+      mongoClient.findOne("user", loginMatch, null, jsonObjectAsyncResult -> {
+        if (jsonObjectAsyncResult.succeeded()) {
+          if (jsonObjectAsyncResult.result() == null) {
+            //login not found
+            response(routingContext, 400, "This user doesn't exist");
+          } else {
+            //found login -> check password
+            String dbPassword = jsonObjectAsyncResult.result().getString("password");
             if (BCrypt.checkpw(password, dbPassword)) {
               //password correct
               routingContext.next();
             } else {
               //password incorrect
-              response(routingContext, 400, "");
-              }
+              response(routingContext, 400, "Incorrect login or password.");
+            }
+          }
+        } else {
+          //not succeeded
+          response(routingContext, 400, "");
         }
-      } else {
-        //not succeeded
-        response(routingContext, 400,"");
-      }
-    });
+      });
+    }
   }
 
   public static void addUser(RoutingContext routingContext) {
@@ -79,7 +86,7 @@ public class UserService {
       if (res.succeeded()) {
         response(routingContext, 201, "Registering successfull.");
       } else {
-        response(routingContext, 400, "");
+        response(routingContext, 400, "Registering failed.");
       }
     });
 

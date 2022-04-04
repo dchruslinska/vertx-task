@@ -19,8 +19,7 @@ public class ItemService {
     routingContext.response()
       .putHeader("content-type", "application/json")
       .setStatusCode(httpstatus)
-      .setStatusMessage(description)
-      .end();
+      .end(description);
   }
 
   public static void addItem(RoutingContext routingContext){
@@ -42,14 +41,10 @@ public class ItemService {
           mongoClient.save("item", itemJson, res -> {
             if(res.succeeded()) {
               response(routingContext, 201, "Item created successfully");
-              log.info("added new item");
             }
           });
         }
-      }).onFailure(fail -> {
-        response(routingContext, 401, "You have not provided an authentication token, the one provided has expired, was revoked or is not authentic.");
-        log.info("login failed");
-    });
+      }).onFailure(fail -> response(routingContext, 401, "You have not provided an authentication token, the one provided has expired, was revoked or is not authentic."));
   }
 
   public static void getItems(RoutingContext routingContext){
