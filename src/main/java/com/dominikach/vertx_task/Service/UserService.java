@@ -34,7 +34,7 @@ public class UserService {
             //found user with this login
           } else {
             routingContext.next();
-            //if body empty
+            //if result empty
           }
         }
       });

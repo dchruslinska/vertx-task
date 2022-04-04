@@ -46,10 +46,8 @@ public class MainVerticle extends AbstractVerticle {
       .handler(UserApi::verifyUser)
       .handler(JwtAuthService::createAuthToken);
     router.post("/items")
-      .handler(JwtAuthService::authenticateUser)
       .handler(ItemApi::addItem);
     router.get("/items")
-      .handler(JwtAuthService::authenticateUser)
       .handler(ItemApi::showItems);
 
     return router;
