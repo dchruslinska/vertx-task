@@ -1,4 +1,4 @@
-package com.dominikach.vertx_task;
+package com.dominikach.vertx_task.Api;
 
 import com.dominikach.vertx_task.Service.ItemService;
 import io.vertx.ext.web.RoutingContext;

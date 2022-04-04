@@ -2,9 +2,9 @@ package com.dominikach.vertx_task.Verticle;
 
 import com.dominikach.vertx_task.Configuration.JwtAuthConfig;
 import com.dominikach.vertx_task.Configuration.MongoConfig;
-import com.dominikach.vertx_task.ItemApi;
+import com.dominikach.vertx_task.Api.ItemApi;
 import com.dominikach.vertx_task.Service.JwtAuthService;
-import com.dominikach.vertx_task.UserApi;
+import com.dominikach.vertx_task.Api.UserApi;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
